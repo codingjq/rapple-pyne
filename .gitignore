@@ -1,0 +1,4 @@
+.web
+__pycache__
+pynecone.db
+scraping
