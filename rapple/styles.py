@@ -17,7 +17,8 @@ guess_box_style = {
 
 lyric_style = {
     "user_select": "none",
-    "color": "transparent",
+    "color": "white",
+    "text-align": "center",
 }
 
 drop_list_style = {
