@@ -1,5 +1,4 @@
 
-from pcconfig import config
 import pynecone as pc
 from rapple.styles import app_style, guess_box_style, lyric_style, drop_list_style
 
@@ -21,7 +20,7 @@ class InputGuess(pc.State):
     guess_index: int = 0
     guess_color: str = "none"
     guesses: dict = {}
-    guess_boxes: dict = {0:"⬜", 1:"⬜", 2:"⬜", 3:"⬜", 4:"⬜", 5:"⬜"}
+    guess_boxes: dict = {0:"⬜", 1:"⬜", 2:"⬜", 3:"⬜", 4:"⬜"}
     current_guess: str|None = ""
     current_guess_id: str
     
@@ -49,8 +48,16 @@ class InputGuess(pc.State):
         bars = []
         if self.song_fetched == True:
             lyrics = json.loads(self.song_of_the_day["lyrics"])
-            for lyric in lyrics[0:self.guess_index+offset]:
-                bars.append(lyric)
+            lyric_num=0
+            lyric_counter=0
+            while lyric_num < self.guess_index+offset:
+                lyric = lyrics[lyric_counter]
+                if "[" in lyric:
+                    pass
+                else:
+                    bars.append(lyric)
+                    lyric_num+=1
+                lyric_counter+=1
             for i in range(self.guess_index+1,5):
                 bars.append("-")
             
@@ -155,7 +162,7 @@ class InputGuess(pc.State):
             self.all_songs = list(map(lambda r: r.dict(), session.query(SongModel).all()))
 
 class QuestionModal(InputGuess):
-    show: bool = False
+    show: bool = True
 
     def change(self):
         self.show = not (self.show)
@@ -227,12 +234,12 @@ def index():
                                                     pc.center(
                                                         pc.text("Rapple was made with ",
                                                         pc.link("@CodingJQ's", href="https://youtube.com/@codingjq", is_external=True, color="coral"),
-                                                        "love of Rap and inspiration",
-                                                        "from other daily guesser genre games. It is built entirely in Python using the ",
+                                                        " love of Rap and inspiration",
+                                                        " from other daily guesser genre games. It is built entirely in Python using ",
                                                         pc.link("@Pynecone-io.", href="https://pynecone.io", is_external=True, color="coral"), 
-                                                        "You can support",
+                                                        " You can support ",
                                                          pc.link("@CodingJQ", href="https://youtube.com/@codingjq", is_external=True, color="coral"),
-                                                         "by watching and subscribing to his YouTube channel."), 
+                                                         " by watching and subscribing to his YouTube channel."), 
                                                 ),
                                             ),
                                         ),
@@ -259,10 +266,10 @@ def index():
                                                         pc.icon(tag="StarIcon"), pc.text("Daily song will reset at 00:01 UTC")
                                                     ),
                                                     pc.hstack(
-                                                        pc.icon(tag="StarIcon"), pc.text("Read the bars, then guess the song and artist.")
+                                                        pc.icon(tag="StarIcon"), pc.text("You start with one lyric and start guessing.")
                                                 ),
                                                     pc.hstack(
-                                                        pc.icon(tag="StarIcon"), pc.text("Skips and incorrect guesses reveal a new bar."),
+                                                        pc.icon(tag="StarIcon"), pc.text("Each missed answer reveals another song lyric."),
                                                     ),
                                                     pc.hstack(
                                                         pc.icon(tag="StarIcon"), pc.text("Get it right in the fewest tries and share!")
@@ -300,7 +307,7 @@ def index():
                         pc.text(InputGuess.get_player_boxes),
                         pc.heading(InputGuess.get_performance["title"], padding_top="4rem"),
                         pc.text(InputGuess.get_performance["description"], padding_bottom="4rem"),
-                          pc.hstack(pc.text("Check out my YouTube channel :"), pc.link("CodingJQ", href="https://youtube.com/@codingjq", is_external=True, color="coral")),
+                          pc.hstack(pc.text("Check out my YouTube channel"), pc.link("CodingJQ", href="https://youtube.com/@codingjq", is_external=True, color="coral")),
                           pc.hstack(pc.text("Learn about "), pc.link("Pynecone", href="https://pynecone.io", color="coral")),
                     ),
                       
@@ -313,6 +320,7 @@ def index():
                         pc.box(InputGuess.guesses[2], bg=InputGuess.box_colors[2], style=guess_box_style),
                         pc.box(InputGuess.guesses[3], bg=InputGuess.box_colors[3], style=guess_box_style),
                         pc.box(InputGuess.guesses[4], bg=InputGuess.box_colors[4], style=guess_box_style),
+                        pc.text("Lyrics", align_text="center"),
                     )
                 ),
                 pc.vstack(
@@ -363,6 +371,6 @@ def result():
 
 # Add state and page to the app.
 app = pc.App(state=InputGuess, style=app_style)
-app.add_page(index, on_load=GetDailySong.get_song)
+app.add_page(index, on_load=GetDailySong.get_song, title="Rapple", description="Hip Hop daily guesser by @codingjq")
 app.add_page(result)
 app.compile()
