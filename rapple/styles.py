@@ -11,7 +11,9 @@ guess_box_style = {
     "text_align":"center", 
     "padding_top": "5px",
     "border":"1px solid darkgrey",
-    "width":"40rem", "height":"2.5rem", 
+    "width":"40rem",
+    "max_width": "80vw", 
+    "height":"2.5rem", 
     "border_radius":"5"
 }
 

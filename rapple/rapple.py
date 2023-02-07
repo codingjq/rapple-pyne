@@ -5,6 +5,7 @@ from rapple.styles import app_style, guess_box_style, lyric_style, drop_list_sty
 import datetime
 import random
 import json
+import asyncio
 
 
 class InputGuess(pc.State):
@@ -64,11 +65,13 @@ class InputGuess(pc.State):
         return bars
 
 
-
     def handle_current_guess(self, e):
+
         self.current_guess = e
+
         if self.all_songs == None:
-            self.get_all_songs()
+            with pc.session() as session:
+                self.all_songs = list(map(lambda r: r.dict(), session.query(SongModel).all()))
 
         title_list = list(filter(lambda songs:self.current_guess.lower() in songs["title"].lower(), self.all_songs))
         artist_list = list(filter(lambda songs:self.current_guess.lower() in songs["artist"].lower(), self.all_songs))
@@ -155,12 +158,6 @@ class InputGuess(pc.State):
         if self.guess_index == 5:
             return self.end_game()
 
-
-    @pc.var
-    def get_all_songs(self):
-        with pc.session() as session:
-            self.all_songs = list(map(lambda r: r.dict(), session.query(SongModel).all()))
-
 class QuestionModal(InputGuess):
     show: bool = True
 
@@ -186,8 +183,10 @@ class DailySong(pc.Model, table=True):
     song_id: str
 
 class GetDailySong(InputGuess):
-    
+
     def get_song(self):
+        if self.song_fetched == True:
+            return
         today_str = datetime.date.today().strftime(f"%d-%m-%y")
         with pc.session() as session:
             today_song = session.query(DailySong).filter(DailySong.date.contains(today_str)).all()
@@ -196,12 +195,23 @@ class GetDailySong(InputGuess):
                 self.song_fetched = True
             else:
                 all_songs = list(map(lambda r: r.dict(), session.query(SongModel).all()))
-                today_song = random.choice(all_songs)
+                
+                def no_repeat():
+                    today_song = random.choice(all_songs)
+                    t_id = today_song["id"]
+                    all_dailies = list(map(lambda r: r.dict(), session.query(DailySong).all()))
+                    if len(list(filter(lambda song: song["song_id"]==t_id, all_dailies)))>0 :
+                        no_repeat()
+                    else:
+                        return today_song
+
+                today_song = no_repeat()    
                 t_artist = today_song["artist"]
                 t_title = today_song["title"]
                 t_lyrics = today_song["lyrics"]
-                t_date = today_str
                 t_id = today_song["id"]
+                t_date = today_str
+                
 
                 session.add(
                     DailySong(
@@ -209,7 +219,7 @@ class GetDailySong(InputGuess):
                 )
                     )
                 session.commit()
-                GetDailySong.get_song()
+                return GetDailySong.get_song
                 
 
 
@@ -287,7 +297,7 @@ def index():
                                 
                                 ),   
                             ),
-                            spacing="10rem"
+                            spacing="5rem",
                                 ),
                             ),
                     width="100%",
@@ -347,9 +357,10 @@ def index():
                             ),
                     position="absolute",
                     ),
-                        width="50rem", z_index=10
+                        width="40rem", z_index=10, max_width="80vw"
                     ),
-                    pc.icon(tag="SearchIcon"),
+                    pc.icon(tag="SearchIcon")
+                    , 
                   
                 ),
                 pc.hstack(
