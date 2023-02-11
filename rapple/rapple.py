@@ -5,7 +5,6 @@ from rapple.styles import app_style, guess_box_style, lyric_style, drop_list_sty
 import datetime
 import random
 import json
-import asyncio
 
 
 class InputGuess(pc.State):
@@ -106,6 +105,14 @@ class InputGuess(pc.State):
     def end_game(self):
         self.end_game_screen = True
         self.buttons_disabled = True
+        with pc.session() as session:
+            session.add(
+                Performance(
+                    guess_index=self.guess_index,
+                    date=datetime.date.today().strftime(f"%d-%m-%y")
+                )
+            )
+            session.commit()
 
     @pc.var
     def get_performance(self) -> dict:
@@ -121,7 +128,7 @@ class InputGuess(pc.State):
             my_string += " "
             my_string += today_str
             my_string += " "
-            my_string += "https://rapple.jervas.com"
+            my_string += "https://rapple.lol"
         return my_string
 
     def copy_clipboard(self):
@@ -169,6 +176,10 @@ class InfoModal(InputGuess):
 
     def change(self):
         self.show = not (self.show)
+
+class Performance(pc.Model, table=True):
+    guess_index: int
+    date: str
 
 class SongModel(pc.Model, table=True):
     artist: str
