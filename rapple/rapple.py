@@ -65,8 +65,9 @@ class InputGuess(pc.State):
 
 
     def handle_current_guess(self, e):
-
+        print(e)
         self.current_guess = e
+        print(self.current_guess)
 
         if self.all_songs == None:
             with pc.session() as session:
@@ -240,7 +241,7 @@ def song_lyrics_item(lyric):
 def selectable_songs_item(song):
     return pc.list_item(song["title"] + "- " + song["artist"], style=drop_list_style, on_click=lambda _: InputGuess.handle_from_list(song))
 
-def index():
+def index() -> pc.Component:
     return  pc.vstack(
                 pc.box(
                     pc.center(
@@ -360,7 +361,7 @@ def index():
                 ),   
                 pc.hstack(
                     pc.container(
-                        pc.input(value=InputGuess.current_guess, placeholder="Guess Title of Song", on_change=InputGuess.handle_current_guess, on_click=InputGuess.clear_selectables, border="1px solid darkgrey"),
+                        pc.input(defaultValue=InputGuess.current_guess, on_change=InputGuess.handle_current_guess,placeholder="Guess Title of Song",  on_click=InputGuess.clear_selectables, border="1px solid darkgrey"),
                         pc.list(
                         pc.foreach(
                             InputGuess.selectable_songs,
