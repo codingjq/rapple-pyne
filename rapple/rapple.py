@@ -68,10 +68,7 @@ class InputGuess(pc.State):
 
     def handle_current_guess(self, e):
         self.show_song_selected = False
-        print(e)
         self.current_guess = e
-        print(self.current_guess)
-
         if self.all_songs == None:
             with pc.session() as session:
                 self.all_songs = list(map(lambda r: r.dict(), session.query(SongModel).all()))
