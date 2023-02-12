@@ -334,7 +334,7 @@ def index() -> pc.Component:
                         pc.heading(InputGuess.get_performance["title"], padding_top="4rem"),
                         pc.text(InputGuess.get_performance["description"], padding_bottom="4rem"),
                           pc.hstack(pc.text("Check out my YouTube channel"), pc.link("CodingJQ", href="https://youtube.com/@codingjq", is_external=True, color="coral")),
-                          pc.hstack(pc.text("Learn about "), pc.link("Pynecone", href="https://pynecone.io", color="coral")),
+                          pc.hstack(pc.text("Learn about "), pc.link("Pynecone", href="https://pynecone.io", is_external=True, color="coral")),
                     ),
                       
                     
