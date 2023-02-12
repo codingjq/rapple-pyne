@@ -360,7 +360,7 @@ def index():
                 ),   
                 pc.hstack(
                     pc.container(
-                        pc.input(defaultValue=InputGuess.current_guess, placeholder="Guess Title of Song", on_change=InputGuess.handle_current_guess, on_click=InputGuess.clear_selectables, border="1px solid darkgrey"),
+                        pc.input(defaultValue=InputGuess.current_guess, value=InputGuess.current_guess, placeholder="Guess Title of Song", on_change=InputGuess.handle_current_guess, on_click=InputGuess.clear_selectables, border="1px solid darkgrey"),
                         pc.list(
                         pc.foreach(
                             InputGuess.selectable_songs,
