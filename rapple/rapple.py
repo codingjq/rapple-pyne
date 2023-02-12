@@ -20,7 +20,7 @@ class InputGuess(pc.State):
     guess_index: int = 0
     guess_color: str = "none"
     guesses: dict = {}
-    guess_boxes: dict = {0:"⬜", 1:"⬜", 2:"⬜", 3:"⬜", 4:"⬜"}
+    guess_boxes: dict = {0:"⬜", 1:"⬜", 2:"⬜", 3:"⬜", 4:"⬜", 5:"⬜"}
     current_guess: str|None = ""
     current_guess_id: str
     show_song_selected: bool = False
@@ -29,7 +29,8 @@ class InputGuess(pc.State):
         {"title":"Aced it!", "description": "You know your bars!"}, 
         {"title":"Great Job!", "description": "You're a Hip-Hop head"}, 
         {"title": "Pretty Good", "description": "You know your stuff"}, 
-        {"title":"Fair", "description": "Okay, okay, hopefully you do better tomorrow!"}, 
+        {"title":"Fair", "description": "Okay, okay, hopefully you do better tomorrow!"},
+        {"title":"Not Great", "description": "But hey, you got it"},
         {"title":"Whew that was close!", "description": "Come on! Do better tomorrow!"}, 
         {"title" :"Try Again Tomorrow!", "description": "You didn't get it. Oh well."}
         ]
@@ -44,7 +45,7 @@ class InputGuess(pc.State):
     @pc.var
     def visible_lyrics(self) -> list:
         offset = 0
-        if self.guess_index < 5:
+        if self.guess_index < 6:
             offset = 1
         bars = []
         if self.song_fetched == True:
@@ -59,7 +60,7 @@ class InputGuess(pc.State):
                     bars.append(lyric)
                     lyric_num+=1
                 lyric_counter+=1
-            for i in range(self.guess_index+1,5):
+            for i in range(self.guess_index+1,6):
                 bars.append("-")
             
         return bars
@@ -142,7 +143,7 @@ class InputGuess(pc.State):
     def submit_guess(self):
         if self.current_guess == "":
             return
-        if self.guess_index<5:
+        if self.guess_index<6:
             self.guesses[self.guess_index] = self.current_guess
             if str(self.current_guess_id) == str(self.song_of_the_day["song_id"]):
                 self.box_colors[self.guess_index] = "green"
@@ -155,18 +156,18 @@ class InputGuess(pc.State):
             self.guess_index += 1
             self.guesses = self.guesses
             self.current_guess = ""
-        if self.guess_index == 5:
+        if self.guess_index == 6:
             return self.end_game()
         
 
     def skip(self):
-        if self.guess_index<5:
+        if self.guess_index<6:
             self.guesses[self.guess_index] = "Skipped"
             self.guess_boxes[self.guess_index] = "⬛"
             self.guess_index += 1
             self.guesses = self.guesses
             self.current_guess = ""
-        if self.guess_index == 5:
+        if self.guess_index == 6:
             return self.end_game()
 
 class QuestionModal(InputGuess):
