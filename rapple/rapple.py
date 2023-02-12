@@ -23,7 +23,8 @@ class InputGuess(pc.State):
     guess_boxes: dict = {0:"⬜", 1:"⬜", 2:"⬜", 3:"⬜", 4:"⬜"}
     current_guess: str|None = ""
     current_guess_id: str
-    
+    show_song_selected: bool = False
+
     performances : list[dict]= [
         {"title":"Aced it!", "description": "You know your bars!"}, 
         {"title":"Great Job!", "description": "You're a Hip-Hop head"}, 
@@ -65,8 +66,10 @@ class InputGuess(pc.State):
 
 
     def handle_current_guess(self, e):
-
+        self.show_song_selected = False
+        print(e)
         self.current_guess = e
+        print(self.current_guess)
 
         if self.all_songs == None:
             with pc.session() as session:
@@ -92,6 +95,7 @@ class InputGuess(pc.State):
         self.current_guess = f'{song["title"]}- {song["artist"]}'
         self.selectable_songs = []
         self.current_guess_id = song["id"]
+        self.show_song_selected = True
 
     def clear_selectables(self):
         if len(self.selectable_songs) > 0:
@@ -240,7 +244,7 @@ def song_lyrics_item(lyric):
 def selectable_songs_item(song):
     return pc.list_item(song["title"] + "- " + song["artist"], style=drop_list_style, on_click=lambda _: InputGuess.handle_from_list(song))
 
-def index():
+def index() -> pc.Component:
     return  pc.vstack(
                 pc.box(
                     pc.center(
@@ -360,7 +364,7 @@ def index():
                 ),   
                 pc.hstack(
                     pc.container(
-                        pc.input(defaultValue=InputGuess.current_guess, placeholder="Guess Title of Song", on_change=InputGuess.handle_current_guess, on_click=InputGuess.clear_selectables, border="1px solid darkgrey"),
+                        pc.input(defaultValue=InputGuess.current_guess, on_change=InputGuess.handle_current_guess, placeholder="Guess Title of Song",  on_click=InputGuess.clear_selectables, border="1px solid darkgrey"),
                         pc.list(
                         pc.foreach(
                             InputGuess.selectable_songs,
@@ -373,6 +377,15 @@ def index():
                     pc.icon(tag="SearchIcon")
                     , 
                   
+                ),
+                pc.cond(
+                    InputGuess.show_song_selected,
+                    pc.vstack(
+                        pc.text("Selected Song:"),
+                        pc.text(InputGuess.current_guess, color="lightgreen"),
+                    ),
+                    pc.text("")
+                    
                 ),
                 pc.hstack(
                     pc.button("Skip", bg="grey", width="8rem", height="3rem", on_click=InputGuess.skip, is_disabled=InputGuess.buttons_disabled ),
