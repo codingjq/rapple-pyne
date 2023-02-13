@@ -39,7 +39,7 @@ class InputGuess(pc.State):
     
     selectable_songs: list[dict] = []
 
-    box_colors: list = ["none" for i in range(0,5)]
+    box_colors: list = ["none" for i in range(0,6)]
     buttons_disabled: bool = False
  
     @pc.var
